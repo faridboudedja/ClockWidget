@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -72,6 +73,23 @@ public class ClockWidget extends AppWidgetProvider {
 
         // Update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName widget = new ComponentName(context.getApplicationContext(), ClockWidget.class);
+
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(widget);
+
+        // Update the widget instances if ACTION_DATE_ALARM is received
+        if(intent.getAction().equals(ACTION_DATE_ALARM)) {
+            if(appWidgetIds.length > 0) {
+                onUpdate(context, appWidgetManager, appWidgetIds);
+            }
+        }
+
+        super.onReceive(context, intent);
     }
 }
 
