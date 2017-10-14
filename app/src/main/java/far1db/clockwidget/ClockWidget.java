@@ -1,14 +1,22 @@
 package far1db.clockwidget;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.Intent;
 import android.widget.RemoteViews;
 
 import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ClockWidget extends AppWidgetProvider {
+
+    private String ACTION_DATE_ALARM = "WidgetDateAlarm";
+    private AlarmManager alarmManager;
+    private PendingIntent alarmIntent;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -16,16 +24,37 @@ public class ClockWidget extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             updateWidgetDate(context, appWidgetManager, appWidgetId);
         }
+
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     @Override
     public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
+        // Set an Alarm to change the date everyday at approximately 00:00
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, ClockWidget.class);
+        intent.setAction(ACTION_DATE_ALARM);
+
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+
+        // Fire the alarm everyday at 00:00
+        alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
+
+        super.onEnabled(context);
     }
 
     @Override
     public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
+        // Cancel the alarm when the last instance of the widget is removed
+        alarmManager.cancel(alarmIntent);
+
+        super.onDisabled(context);
     }
 
     private void updateWidgetDate(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
