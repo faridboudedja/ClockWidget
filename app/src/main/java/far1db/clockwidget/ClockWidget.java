@@ -7,11 +7,16 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.provider.AlarmClock;
+import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ClockWidget extends AppWidgetProvider {
 
@@ -23,7 +28,7 @@ public class ClockWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // Update all instances of the widget
         for (int appWidgetId : appWidgetIds) {
-            updateWidgetDate(context, appWidgetManager, appWidgetId);
+            updateWidget(context, appWidgetManager, appWidgetId);
         }
 
         super.onUpdate(context, appWidgetManager, appWidgetIds);
@@ -58,7 +63,7 @@ public class ClockWidget extends AppWidgetProvider {
         super.onDisabled(context);
     }
 
-    private void updateWidgetDate(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
+    private void updateWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         // Get date
         Date date = new Date();
         date.getTime();
@@ -70,6 +75,18 @@ public class ClockWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.clock_widget);
         // Display the date in the appropriate text view
         views.setTextViewText(R.id.tv_date, dateStr);
+
+        // Open the default alarm app when the widget is clicked
+        Intent clockIntent = new Intent(AlarmClock.ACTION_SHOW_ALARMS);
+
+        PackageManager packageManager = context.getPackageManager();
+        List activities = packageManager.queryIntentActivities(clockIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        // Verify if there is an application to receive the intent
+        if ( activities.size() > 0 ) {
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clockIntent, 0);
+            views.setOnClickPendingIntent(R.id.layout_widget, pendingIntent);
+        }
 
         // Update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
