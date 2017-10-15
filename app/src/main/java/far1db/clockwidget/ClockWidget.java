@@ -36,7 +36,7 @@ public class ClockWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        // Set an Alarm to change the date everyday at approximately 00:00
+        // Set an Alarm to change the date everyday at 00:00
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, ClockWidget.class);
@@ -49,7 +49,7 @@ public class ClockWidget extends AppWidgetProvider {
         calendar.set(Calendar.HOUR_OF_DAY, 0);
 
         // Fire the alarm everyday at 00:00
-        alarmManager.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+        alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, alarmIntent);
 
         super.onEnabled(context);
