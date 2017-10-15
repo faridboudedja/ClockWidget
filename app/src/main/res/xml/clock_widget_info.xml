@@ -4,7 +4,7 @@
     android:initialLayout="@layout/clock_widget"
     android:minHeight="40dp"
     android:minWidth="110dp"
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/clockwidget_preview"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"></appwidget-provider>
